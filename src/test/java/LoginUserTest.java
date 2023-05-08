@@ -5,11 +5,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import model.User;
 import model.UserCredential;
-import model.UserMethods;
+import methods.UserMethods;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class LoginUserTest {
@@ -20,7 +22,7 @@ public class LoginUserTest {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = BaseURI.baseURI;
+        RestAssured.baseURI = BaseURI.BASE_URI;
         user = UserData.defaultUser();
         userMethods = new UserMethods();
     }
@@ -31,7 +33,7 @@ public class LoginUserTest {
         ValidatableResponse response = userMethods.createUser(user);
         accessToken =response.extract().path("accessToken").toString().substring(7);
         userMethods.loginUser(credential.from(user))
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true));
     }
@@ -43,7 +45,7 @@ public class LoginUserTest {
         accessToken =response.extract().path("accessToken").toString().substring(7);
         user.setEmail("parirumchik@yandex.ru");
         userMethods.loginUser(credential.from(user))
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body("success", equalTo(false));
     }
@@ -56,7 +58,7 @@ public class LoginUserTest {
         accessToken =response.extract().path("accessToken").toString().substring(7);
         user.setPassword("Парирумчик");
         userMethods.loginUser(credential.from(user))
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body("success", equalTo(false));
     }
@@ -67,4 +69,4 @@ public class LoginUserTest {
     public void cleanDate(){
         if(accessToken != null) userMethods.deleteUser(accessToken);
     }
-    }
+}

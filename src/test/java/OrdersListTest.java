@@ -5,12 +5,15 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import model.Order;
-import model.OrderMethods;
+import methods.OrderMethods;
 import model.User;
-import model.UserMethods;
+import methods.UserMethods;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class OrdersListTest {
     private User user;
@@ -21,7 +24,7 @@ public class OrdersListTest {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = BaseURI.baseURI;
+        RestAssured.baseURI = BaseURI.BASE_URI;
         user = UserData.defaultUser();
         order = OrderData.defaultOrder();
         userMethods = new UserMethods();
@@ -35,14 +38,14 @@ public class OrdersListTest {
     @DisplayName("Получение списка авторизованным пользователем")
     public void getListOfOrdersForAuthorisedUser(){
         orderMethods.gerOrdersForAuthorisedUser("Bearer "+ accessToken)
-                .statusCode(200);
+                .statusCode(SC_OK);
     }
 
     @Test
     @DisplayName("Получение списка заказов неавторизованным пользователем")
     public void getListOfOrdersForNotAuthorisedUser(){
         orderMethods.getOrdersNotAuthorisedUser()
-                .statusCode(401);
+                .statusCode(SC_UNAUTHORIZED);
     }
 
     @After

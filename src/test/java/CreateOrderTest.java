@@ -4,12 +4,16 @@ import data.UserData;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
+import methods.OrderMethods;
+import methods.UserMethods;
 import model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import static org.apache.http.HttpStatus.*;
 
 @RunWith(Parameterized.class)
 public class CreateOrderTest {
@@ -29,7 +33,7 @@ public class CreateOrderTest {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = BaseURI.baseURI;
+        RestAssured.baseURI = BaseURI.BASE_URI;
         user = UserData.defaultUser();
         userMethods = new UserMethods();
         orderMethods = new OrderMethods();
@@ -41,9 +45,9 @@ public class CreateOrderTest {
     @Parameterized.Parameters
     public static Object[][] getTestData() {
         return new Object[][]{
-                {OrderData.defaultOrder(), 200},
-                {OrderData.emptyOrder(), 400},
-                {OrderData.orderWithWrongIDs(), 500}
+                {OrderData.defaultOrder(), SC_OK},
+                {OrderData.emptyOrder(), SC_BAD_REQUEST},
+                {OrderData.orderWithWrongIDs(), SC_INTERNAL_SERVER_ERROR}
         };
     }
 

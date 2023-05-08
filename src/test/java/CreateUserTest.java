@@ -4,11 +4,13 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import model.User;
-import model.UserMethods;
+import methods.UserMethods;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateUserTest {
@@ -18,7 +20,7 @@ public class CreateUserTest {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = BaseURI.baseURI;
+        RestAssured.baseURI = BaseURI.BASE_URI;
         user = UserData.defaultUser();
         userMethods = new UserMethods();
     }
@@ -27,7 +29,7 @@ public class CreateUserTest {
     @DisplayName("Позитивный тест на создание пользователя")
     public void userIsCreated(){
         ValidatableResponse response = userMethods.createUser(user);
-        response.statusCode(200)
+        response.statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true));
         accessToken = response.extract().path("accessToken").toString().substring(7);
@@ -40,7 +42,7 @@ public class CreateUserTest {
         accessToken =response.extract().path("accessToken").toString().substring(7);
         user.setPassword("парирумчик");
         ValidatableResponse responseForDuplication = userMethods.createUser(user);
-        responseForDuplication.statusCode(403)
+        responseForDuplication.statusCode(SC_FORBIDDEN)
                 .and()
                 .body("success", equalTo(false))
                 .body("message", equalTo("User already exists"));
@@ -51,7 +53,7 @@ public class CreateUserTest {
     public void createUserWithoutLogin(){
         user = UserData.userWithoutEmail();
         ValidatableResponse response = userMethods.createUser(user);
-        response.statusCode(403)
+        response.statusCode(SC_FORBIDDEN)
                 .and()
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
@@ -62,7 +64,7 @@ public class CreateUserTest {
     public void createUserWithoutPassword(){
         user = UserData.userWithoutPassword();
         ValidatableResponse response = userMethods.createUser(user);
-        response.statusCode(403)
+        response.statusCode(SC_FORBIDDEN)
                 .and()
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
@@ -73,7 +75,7 @@ public class CreateUserTest {
     public void createUserWithoutName(){
         user = UserData.userWithoutName();
         ValidatableResponse response = userMethods.createUser(user);
-        response.statusCode(403)
+        response.statusCode(SC_FORBIDDEN)
                 .and()
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
